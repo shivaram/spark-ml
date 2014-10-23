@@ -4,18 +4,14 @@ import scala.collection.mutable.ListBuffer
 
 trait PipelineStage extends Identifiable
 
-class Pipeline(override val id: String) extends Estimator {
+class Pipeline(override val id: String, var stages: Seq[PipelineStage]) extends Estimator {
 
-  def this() = this("Pipeline-" + Identifiable.randomId())
+  def this() = this("Pipeline-" + Identifiable.randomId(), Seq[PipelineStage]())
 
-  val stages: Param[Array[PipelineStage]] =
-    new Param[Array[PipelineStage]](this, "stages", "stages of the pipeline", None)
-
-  override def fit(dataset: Dataset, paramMap: ParamMap): Transformer = {
-    val theStages = paramMap.getOrDefault(stages)
+  override def fit(dataset: Dataset): Transformer = {
     // Search for last estimator.
     var lastIndexOfEstimator = -1
-    theStages.view.zipWithIndex.foreach { case (stage, index) =>
+    stages.view.zipWithIndex.foreach { case (stage, index) =>
       stage match {
         case _: Estimator =>
           lastIndexOfEstimator = index
@@ -24,17 +20,17 @@ class Pipeline(override val id: String) extends Estimator {
     }
     var curDataset = dataset
     val transformers = ListBuffer.empty[Transformer]
-    theStages.view.zipWithIndex.foreach { case (stage, index) =>
+    stages.view.zipWithIndex.foreach { case (stage, index) =>
       stage match {
         case estimator: Estimator =>
-          val transformer = estimator.fit(dataset, paramMap)
+          val transformer = estimator.fit(dataset)
           if (index < lastIndexOfEstimator) {
-            curDataset = transformer.transform(curDataset, paramMap)
+            curDataset = transformer.transform(curDataset)
           }
           transformers += transformer
         case transformer: Transformer =>
           if (index < lastIndexOfEstimator) {
-            curDataset = transformer.transform(curDataset, paramMap)
+            curDataset = transformer.transform(curDataset)
           }
           transformers += transformer
         case _ =>
@@ -44,8 +40,6 @@ class Pipeline(override val id: String) extends Estimator {
 
     new Pipeline.Model(transformers.toArray)
   }
-
-  override def params: Array[Param[_]] = Array.empty
 }
 
 object Pipeline {
@@ -54,9 +48,9 @@ object Pipeline {
 
     def this(transformers: Array[Transformer]) = this("Pipeline.Model-" + Identifiable.randomId(), transformers)
 
-    override def transform(dataset: Dataset, paramMap: ParamMap): Dataset = {
+    override def transform(dataset: Dataset): Dataset = {
       transformers.foldLeft(dataset) { (dataset, transformer) =>
-        transformer.transform(dataset, paramMap)
+        transformer.transform(dataset)
       }
     }
   }
