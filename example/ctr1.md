@@ -1,3 +1,4 @@
+```
 val dataset = sqlContext.sql("""
   SELECT impressionId, impression.userId, impression.adId, click.clickId,
     impressionTime, browser, ip, userFeatures, adFeatures, clickTime IS NOT NULL AS label
@@ -50,3 +51,4 @@ pipeline.get("StratifiedSampler").seed = 100
 val model2 = pipeline.fit(dataset)
 
 // TODO: Hyperparameter tuning
+```
