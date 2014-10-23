@@ -4,9 +4,15 @@ import scala.collection.mutable.ListBuffer
 
 trait PipelineStage extends Identifiable
 
-class Pipeline(val stages: Seq[PipelineStage]) extends Estimator {
+class Pipeline(initStages: PipelineStage*) extends Estimator {
 
-  def this() = this(Seq[PipelineStage]())
+  val stages = new ListBuffer[PipelineStage]
+  stages.appendAll(initStages)
+
+  def andThen(stage: PipelineStage): Pipeline = {
+    stages += stage
+    this
+  }
 
   override def fit(dataset: Dataset): Transformer = {
     // Search for last estimator.
