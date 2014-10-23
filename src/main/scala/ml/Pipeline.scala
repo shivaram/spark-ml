@@ -4,9 +4,9 @@ import scala.collection.mutable.ListBuffer
 
 trait PipelineStage extends Identifiable
 
-class Pipeline(override val id: String, var stages: Seq[PipelineStage]) extends Estimator {
+class Pipeline(val stages: Seq[PipelineStage]) extends Estimator {
 
-  def this() = this("Pipeline-" + Identifiable.randomId(), Seq[PipelineStage]())
+  def this() = this(Seq[PipelineStage]())
 
   override def fit(dataset: Dataset): Transformer = {
     // Search for last estimator.
@@ -44,9 +44,7 @@ class Pipeline(override val id: String, var stages: Seq[PipelineStage]) extends 
 
 object Pipeline {
 
-  class Model(override val id: String, val transformers: Array[Transformer]) extends Transformer {
-
-    def this(transformers: Array[Transformer]) = this("Pipeline.Model-" + Identifiable.randomId(), transformers)
+  class Model(val transformers: Array[Transformer]) extends Transformer {
 
     override def transform(dataset: Dataset): Dataset = {
       transformers.foldLeft(dataset) { (dataset, transformer) =>

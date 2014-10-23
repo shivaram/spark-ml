@@ -5,8 +5,12 @@ import java.util.UUID
 /**
  * Something with a unique id.
  */
-trait Identifiable {
-  val id: String
+abstract class Identifiable {
+  var id: String = getClass.getName + Identifiable.randomId() 
+
+  def setId(idStr: String) = {
+    id = idStr
+  }
 }
 
 object Identifiable {

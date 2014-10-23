@@ -7,13 +7,12 @@ import org.apache.spark.rdd.RDD
 import ml._
 
 class RandomSignTransformer(
-  override val id: String,
   var input: String,
   var output: String) extends Transformer {
 
   // Empty constructor for use from Python.
   def this() = {
-    this("random-sign-" + Identifiable.randomId(), "", "")
+    this("", "")
   }
 
   // TODO: Can we make this implicit ?

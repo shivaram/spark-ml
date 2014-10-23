@@ -9,11 +9,10 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.sql.Row
 
 class LogisticRegression(
-  override val id: String, 
   var maxIter: Int, 
   var regParam: Double) extends Estimator {
 
-  def this() = this("lr-" + Identifiable.randomId(), 100, 0.1)
+  def this() = this(100, 0.1)
 
   // val maxIter: Param[Int] = new Param(this, "maxIter", "max number of iterations", Some(100))
   // 
@@ -31,12 +30,12 @@ class LogisticRegression(
     //   .setNumIterations(maxIter)
     // val model = lr.run(instances)
     // new LogisticRegression.Model(id + ".model", model.weights)
-    new LogisticRegression.Model(id + ".model", Vectors.zeros(10))
+    new LogisticRegression.Model(Vectors.zeros(10))
   }
 }
 
 object LogisticRegression {
-  class Model(override val id: String, weight: Vector) extends Transformer {
+  class Model(weight: Vector) extends Transformer {
     override def transform(dataset: Dataset): Dataset = {
       null
     }
