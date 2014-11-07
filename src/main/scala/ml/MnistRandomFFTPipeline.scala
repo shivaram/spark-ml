@@ -35,7 +35,7 @@ object MnistRandomFFTPipeline {
 
     val conf = new SparkConf().setMaster(sparkMaster)
       .setAppName("MnistRandomFFTPipeline")
-      .set("spark.executor.memory", System.getenv("SPARK_MEM"))
+      .set("spark.executor.memory", "2g")
       .setJars(SparkContext.jarOfObject(this).toSeq)
     val sc = new SparkContext(conf)
 
@@ -91,9 +91,15 @@ object MnistRandomFFTPipeline {
 
     val model = pipeline.fit(train)
 
-    val endTime = System.currentTimeMillis
-    println("Pipeline took " + (endTime - startTime)/1000 + " s")
+    val predictions = model.transform(test)
 
+    // TODO: How do I chain an evaluator to a Pipeline ?
+    val err = new MaxClassifier().setLabelCol("label").setInputCol("predictedLabels").evaluate(predictions, new ParamMap())
+
+    val endTime = System.currentTimeMillis
+    println("Pipeline took " + (endTime - startTime)/1000 + " s" + " Error was " + err)
+
+    sc.stop()
     System.exit(0)
   }
 }

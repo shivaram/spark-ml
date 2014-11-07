@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.ml._
 import org.apache.spark.ml.param._
 import org.apache.spark.mllib.feature
-import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.sql.SchemaRDD
 import org.apache.spark.sql.catalyst.analysis.Star
 import org.apache.spark.sql.catalyst.dsl._
@@ -36,7 +36,8 @@ class FFTransform extends Transformer with HasInputCol with HasOutputCol {
 
     // TODO: Why can't this UDF be a function defined in this class ? 
     // How do I test this UDF ?
-    val fft: Array[Double] => Array[Double] = (in) => {
+    val fft: Vector => Vector = (inV) => {
+      val in = inV.toArray
       System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
 
       val numFFTVals = FFTransform.nextPowerOfTwo(in.length)
@@ -62,7 +63,7 @@ class FFTransform extends Transformer with HasInputCol with HasOutputCol {
       assert(fft.forall(!_.isNaN))
       tmat.setTo(new Scalar(0.0))
 
-      fft
+      Vectors.dense(fft)
     }
 
     // TODO: Need to call mapPartitions !

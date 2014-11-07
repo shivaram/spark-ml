@@ -29,7 +29,7 @@ class ClassLabelIndicators(numClasses: Int) extends Transformer with Params with
 
     val createClassLabels: Double => Vector = (in) => {
       val a = Array.fill(numClasses)(-1.0)
-      a(in.toInt) = 1.0
+      a(in.toInt - 1) = 1.0
       Vectors.dense(a)
     }
 
