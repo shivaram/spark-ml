@@ -13,6 +13,8 @@ To run the MNIST pipeline
     - http://s3.amazonaws.com/mnist-data/test-mnist-dense-with-labels.data 
 
 2. Run the pipeline using
+```
   ./sbt/sbt \ 
     -Djava.library.path=/Users/shivaram/debian-shared/spark-ml/lib \
     "run-main ml.MnistRandomFFTPipeline local data/train-mnist-dense-with-labels.data data/test-mnist-dense-with-labels.data 1"
+```
